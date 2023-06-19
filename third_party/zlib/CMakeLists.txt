@@ -310,3 +310,10 @@ set_target_properties(zlibstatic PROPERTIES FOLDER "MojangPlatform/src-external"
 if(IOS)
   target_compile_definitions(zlibstatic PUBLIC -DHAVE_UNISTD_H)
 endif()
+
+install(TARGETS zlibstatic
+    EXPORT leveldbTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
