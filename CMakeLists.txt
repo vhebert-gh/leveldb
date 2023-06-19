@@ -37,6 +37,7 @@ option(LEVELDB_INSTALL "Install LevelDB's header and library" ON)
 include(CheckIncludeFile)
 check_include_file("unistd.h" HAVE_UNISTD_H)
 
+#add_subdirectory("third_party/zlib")
 include(CheckLibraryExists)
 check_library_exists(crc32c crc32c_value "" HAVE_CRC32C)
 check_library_exists(snappy snappy_compress "" HAVE_SNAPPY)
@@ -283,7 +284,7 @@ endif(HAVE_TCMALLOC)
 
 # Needed by port_stdcxx.h
 find_package(Threads REQUIRED)
-target_link_libraries(leveldb Threads::Threads)
+target_link_libraries(leveldb PUBLIC Threads::Threads zlibstatic)
 
 add_executable(leveldbutil
   "db/leveldbutil.cc"
