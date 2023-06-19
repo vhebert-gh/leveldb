@@ -284,7 +284,7 @@ endif(HAVE_TCMALLOC)
 
 # Needed by port_stdcxx.h
 find_package(Threads REQUIRED)
-target_link_libraries(leveldb PUBLIC Threads::Threads zlibstatic)
+target_link_libraries(leveldb PUBLIC Threads::Threads zlibstaticleveldb)
 
 add_executable(leveldbutil
   "db/leveldbutil.cc"

@@ -12,7 +12,7 @@ set(SKIP_INSTALL_ALL 1)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 
-project(zlib C)
+project(zlibleveldb C)
 
 set(VERSION "1.2.8")
 
@@ -20,9 +20,9 @@ option(ASM686 "Enable building i686 assembly implementation")
 option(AMD64 "Enable building amd64 assembly implementation")
 
 if(BUILD_ZLIB_SHARED)
-    set(zlib_targets zlib zlibstatic)
+    set(zlib_targets zlibleveldb zlibstaticleveldb)
 else()
-    set(zlib_targets zlibstatic)
+    set(zlib_targets zlibstaticleveldb)
 endif()
 
 
@@ -207,13 +207,13 @@ if(MINGW)
 endif(MINGW)
 
 
-add_library(zlibstatic STATIC ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
+add_library(zlibstaticleveldb STATIC ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
 
 
 if(BUILD_ZLIB_SHARED)
-    add_library(zlib SHARED ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_DLL_SRCS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
-    set_target_properties(zlib PROPERTIES DEFINE_SYMBOL ZLIB_DLL)
-    set_target_properties(zlib PROPERTIES SOVERSION 1)
+    add_library(zlibleveldb SHARED ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_DLL_SRCS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
+    set_target_properties(zlibleveldb PROPERTIES DEFINE_SYMBOL ZLIB_DLL)
+    set_target_properties(zlibleveldb PROPERTIES SOVERSION 1)
 endif()
 
 
@@ -225,18 +225,18 @@ if(NOT CYGWIN AND BUILD_ZLIB_SHARED)
     #
     # This has no effect with MSVC, on that platform the version info for
     # the DLL comes from the resource file win32/zlib1.rc
-    set_target_properties(zlib PROPERTIES VERSION ${ZLIB_FULL_VERSION})
+    set_target_properties(zlibleveldb PROPERTIES VERSION ${ZLIB_FULL_VERSION})
 endif()
 
 if(UNIX)
     # On unix-like platforms the library is almost always called libz
    set_target_properties(${zlib_targets} PROPERTIES OUTPUT_NAME z)
    if(NOT APPLE AND BUILD_ZLIB_SHARED)
-     set_target_properties(zlib PROPERTIES LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/zlib/zlib.map\"")
+     set_target_properties(zlibleveldb PROPERTIES LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/zlib/zlib.map\"")
    endif()
 elseif(BUILD_SHARED_LIBS AND WIN32 AND BUILD_ZLIB_SHARED)
     # Creates zlib1.dll when building shared library version
-    set_target_properties(zlib PROPERTIES SUFFIX "1.dll")
+    set_target_properties(zlibleveldb PROPERTIES SUFFIX "1.dll")
 endif()
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
@@ -261,26 +261,26 @@ endif()
 
 if(BUILD_ZLIB_EXAMPLE)
     add_executable(example zlib/test/example.c)
-    target_link_libraries(example zlibstatic)
+    target_link_libraries(example zlibstaticleveldb)
     add_test(example example)
 endif()
 
 if(BUILD_ZLIB_MINIGZIP)
     add_executable(minigzip zlib/test/minigzip.c)
-    target_link_libraries(minigzip zlibstatic)
+    target_link_libraries(minigzip zlibstaticleveldb)
 endif()
 
 if(HAVE_OFF64_T)
     if(BUILD_ZLIB_EXAMPLE)
         add_executable(example64 zlib/test/example.c)
-        target_link_libraries(example64 zlibstatic)
+        target_link_libraries(example64 zlibstaticleveldb)
         set_target_properties(example64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
         add_test(example64 example64)
     endif()
 
     if(BUILD_ZLIB_MINIGZIP)
         add_executable(minigzip64 zlib/test/minigzip.c)
-        target_link_libraries(minigzip64 zlibstatic)
+        target_link_libraries(minigzip64 zlibstaticleveldb)
         set_target_properties(minigzip64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
     endif()
 endif()
@@ -290,30 +290,32 @@ endif()
 # zlibstatic specific setup, remember to update for zlib, example and minigzip for future if necessary
 #========================================================================================================
 
-target_compile_options(zlibstatic PRIVATE ${disableWarning})
+target_compile_options(zlibstaticleveldb PRIVATE ${disableWarning})
 
-target_include_directories(zlibstatic 
+target_include_directories(zlibstaticleveldb 
   PUBLIC 
     . 
-    zlib
+    zlibleveldb
 )
 
 if(MSVC)
-  target_compile_definitions(zlibstatic
+  target_compile_definitions(zlibstaticleveldb
   PRIVATE
     _CRT_SECURE_NO_WARNINGS
   )
 endif()
 
-set_target_properties(zlibstatic PROPERTIES FOLDER "MojangPlatform/src-external")
+set_target_properties(zlibstaticleveldb PROPERTIES FOLDER "MojangPlatform/src-external")
 
 if(IOS)
-  target_compile_definitions(zlibstatic PUBLIC -DHAVE_UNISTD_H)
+  target_compile_definitions(zlibstaticleveldb PUBLIC -DHAVE_UNISTD_H)
 endif()
 
-install(TARGETS zlibstatic
+install(TARGETS zlibstaticleveldb
     EXPORT leveldbTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
+
+add_subdirectory("zlib")
