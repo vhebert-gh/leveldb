@@ -153,6 +153,20 @@ Status ReadBlock(RandomAccessFile* file, const ReadOptions& options,
       result->cachable = true;
       break;
     }
+    case kZLibRawCompression: {
+      std::string buffer;
+      if (!port::ZLibRaw_Uncompress(data, n, buffer)) {
+        delete[] buf;
+        return Status::Corruption("corrupted zlib compressed block contents");
+      }
+      auto ubuf = new char[buffer.size()];
+      memcpy(ubuf, buffer.data(), buffer.size());
+      delete[] buf;
+      result->data = Slice(ubuf, buffer.size());
+      result->heap_allocated = true;
+      result->cachable = true;
+      break;
+    }
     default:
       delete[] buf;
       return Status::Corruption("bad block type");

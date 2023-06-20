@@ -32,6 +32,7 @@
 #define ZSTD_STATIC_LINKING_ONLY  // For ZSTD_compressionParameters.
 #include <zstd.h>
 #endif  // HAVE_ZSTD
+#include <third_party/zlib/zlib/zlib.h>
 
 #include <cassert>
 #include <condition_variable>  // NOLINT
@@ -196,6 +197,58 @@ inline bool Zstd_Uncompress(const char* input, size_t length, char* output) {
   (void)output;
   return false;
 #endif  // HAVE_ZSTD
+}
+
+inline bool ZLibRaw_Uncompress(const char* input, size_t length, ::std::string& output) {
+  const int CHUNK = 64 * 1024;
+
+  int ret;
+  size_t have;
+  z_stream strm;
+  unsigned char out[CHUNK];
+
+  /* allocate inflate state */
+  strm.zalloc = Z_NULL;
+  strm.zfree = Z_NULL;
+  strm.opaque = Z_NULL;
+  strm.avail_in = (uint32_t)length;
+  strm.next_in = (Bytef*)input;
+
+  ret = inflateInit2(&strm, (true? -15 : 15));
+
+  if (ret != Z_OK) {
+    return ret == Z_OK;
+  }
+
+  /* decompress until deflate stream ends or end of file */
+  do {
+    /* run inflate() on input until output buffer not full */
+    do {
+      strm.avail_out = CHUNK;
+      strm.next_out = out;
+
+      ret = ::inflate(&strm, Z_NO_FLUSH);
+
+      if (ret == Z_NEED_DICT) {
+        ret = Z_DATA_ERROR;
+      }
+      if (ret < 0) {
+        (void)inflateEnd(&strm);
+        return ret == Z_OK;
+      }
+
+      have = CHUNK - strm.avail_out;
+
+      output.append((char*)out, have);
+
+    } while (strm.avail_out == 0);
+
+    /* done when inflate() says it's done */
+  } while (ret != Z_STREAM_END);
+
+  /* clean up and return */
+  (void)inflateEnd(&strm);
+  return (ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR) == Z_OK;
 }
 
 inline bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg) {
