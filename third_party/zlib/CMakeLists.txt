@@ -294,8 +294,8 @@ target_compile_options(zlibstaticleveldb PRIVATE ${disableWarning})
 
 target_include_directories(zlibstaticleveldb 
   PUBLIC 
-    . 
-    zlibleveldb
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/zlib>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDE_DIR}>
 )
 
 if(MSVC)
@@ -311,11 +311,10 @@ if(IOS)
   target_compile_definitions(zlibstaticleveldb PUBLIC -DHAVE_UNISTD_H)
 endif()
 
+
 install(TARGETS zlibstaticleveldb
     EXPORT leveldbTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
-
-add_subdirectory("zlib")
