@@ -136,6 +136,9 @@ struct LEVELDB_EXPORT Options {
   // Currently only the range [-5,22] is supported. Default is 1.
   int zstd_compression_level = 1;
 
+  //Compression level for zlibraw.
+  int zlib_compression_level = -1;
+
   // EXPERIMENTAL: If true, append to existing MANIFEST and log files
   // when a database is opened.  This can significantly speed up open.
   //

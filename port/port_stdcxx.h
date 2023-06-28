@@ -161,6 +161,58 @@ inline bool Zstd_Compress(int level, const char* input, size_t length,
 #endif  // HAVE_ZSTD
 }
 
+inline bool ZlibRaw_Compress(int level, const char* input, size_t length,
+                             ::std::string* output){
+  const size_t BUFSIZE = 128 * 1024;
+  unsigned char temp_buffer[BUFSIZE];
+
+  // reserve enough memory to not reallocate on the fly
+  output->reserve(output->size() + compressBound(length));
+
+  z_stream strm;
+  strm.zalloc = 0;
+  strm.zfree = 0;
+  strm.next_in = (unsigned char*)(input);
+  strm.avail_in = (uint32_t)length;
+  strm.next_out = temp_buffer;
+  strm.avail_out = BUFSIZE;
+
+  auto res = deflateInit2(&strm, level, Z_DEFLATED, true ? -15 : 15, 8,
+                          Z_DEFAULT_STRATEGY);
+  if (res != Z_OK) {
+    return false;
+  }
+
+  int deflate_res = Z_OK;
+  while (strm.avail_in != 0) {
+    int res = deflate(&strm, Z_NO_FLUSH);
+    if (res != Z_OK) {
+      return false;
+    }
+    if (strm.avail_out == 0) {
+      output->append(temp_buffer, temp_buffer + BUFSIZE);
+      strm.next_out = temp_buffer;
+      strm.avail_out = BUFSIZE;
+    }
+  }
+
+  while (deflate_res == Z_OK) {
+    if (strm.avail_out == 0) {
+      output->append(temp_buffer, temp_buffer + BUFSIZE);
+      strm.next_out = temp_buffer;
+      strm.avail_out = BUFSIZE;
+    }
+    deflate_res = deflate(&strm, Z_FINISH);
+  }
+
+  if (deflate_res != Z_STREAM_END) {
+    return false;
+  }
+  output->append(temp_buffer, temp_buffer + BUFSIZE - strm.avail_out);
+  deflateEnd(&strm);
+  return true;
+}
+
 inline bool Zstd_GetUncompressedLength(const char* input, size_t length,
                                        size_t* result) {
 #if HAVE_ZSTD
