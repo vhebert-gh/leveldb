@@ -32,7 +32,7 @@
 #define ZSTD_STATIC_LINKING_ONLY  // For ZSTD_compressionParameters.
 #include <zstd.h>
 #endif  // HAVE_ZSTD
-#include <third_party/zlib/zlib/zlib.h>
+#include <zlib.h>
 
 #include <cassert>
 #include <condition_variable>  // NOLINT
