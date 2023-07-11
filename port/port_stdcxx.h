@@ -25,9 +25,9 @@
 #if HAVE_CRC32C
 #include <crc32c/crc32c.h>
 #endif  // HAVE_CRC32C
-#if HAVE_SNAPPY
+//#if HAVE_SNAPPY
 #include <snappy.h>
-#endif  // HAVE_SNAPPY
+//#endif  // HAVE_SNAPPY
 #if HAVE_ZSTD
 #define ZSTD_STATIC_LINKING_ONLY  // For ZSTD_compressionParameters.
 #include <zstd.h>
@@ -90,45 +90,48 @@ class CondVar {
 
 inline bool Snappy_Compress(const char* input, size_t length,
                             std::string* output) {
-#if HAVE_SNAPPY
+//#if HAVE_SNAPPY
   output->resize(snappy::MaxCompressedLength(length));
   size_t outlen;
   snappy::RawCompress(input, length, &(*output)[0], &outlen);
   output->resize(outlen);
   return true;
-#else
-  // Silence compiler warnings about unused arguments.
+/*#else
+  //Silence compiler warnings about unused arguments.
   (void)input;
   (void)length;
   (void)output;
 #endif  // HAVE_SNAPPY
 
   return false;
+  */
 }
 
 inline bool Snappy_GetUncompressedLength(const char* input, size_t length,
                                          size_t* result) {
-#if HAVE_SNAPPY
+//#if HAVE_SNAPPY
   return snappy::GetUncompressedLength(input, length, result);
-#else
+/*#else
   // Silence compiler warnings about unused arguments.
   (void)input;
   (void)length;
   (void)result;
   return false;
 #endif  // HAVE_SNAPPY
+*/
 }
 
 inline bool Snappy_Uncompress(const char* input, size_t length, char* output) {
-#if HAVE_SNAPPY
+//#if HAVE_SNAPPY
   return snappy::RawUncompress(input, length, output);
-#else
+/*#else
   // Silence compiler warnings about unused arguments.
   (void)input;
   (void)length;
   (void)output;
   return false;
 #endif  // HAVE_SNAPPY
+*/
 }
 
 inline bool Zstd_Compress(int level, const char* input, size_t length,

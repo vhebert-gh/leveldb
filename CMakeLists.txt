@@ -44,6 +44,9 @@ check_library_exists(snappy snappy_compress "" HAVE_SNAPPY)
 check_library_exists(zstd zstd_compress "" HAVE_ZSTD)
 check_library_exists(tcmalloc malloc "" HAVE_TCMALLOC)
 
+#remove when check_library_exits starts working
+set(HAVE_SNAPPY ON)
+
 include(CheckCXXSymbolExists)
 # Using check_cxx_symbol_exists() instead of check_c_symbol_exists() because
 # we're including the header from C++, and feature detection should use the same
@@ -284,7 +287,7 @@ endif(HAVE_TCMALLOC)
 
 # Needed by port_stdcxx.h
 find_package(Threads REQUIRED)
-target_link_libraries(leveldb PUBLIC Threads::Threads zlibstaticleveldb)
+target_link_libraries(leveldb Threads::Threads zlibstaticleveldb)
 
 add_executable(leveldbutil
   "db/leveldbutil.cc"
