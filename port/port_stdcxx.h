@@ -16,8 +16,8 @@
 
 #elif defined(__has_include)
 
-#if __has_include("port/port_config.h")
-#include "port/port_config.h"
+#if __has_include("port_2/port_config.h")
+#include "port_2/port_config.h"
 #endif  // __has_include("port/port_config.h")
 
 #endif  // defined(LEVELDB_HAS_PORT_CONFIG_H)
@@ -28,10 +28,10 @@
 //#if HAVE_SNAPPY
 #include <snappy.h>
 //#endif  // HAVE_SNAPPY
-#if HAVE_ZSTD
+//#if HAVE_ZSTD
 #define ZSTD_STATIC_LINKING_ONLY  // For ZSTD_compressionParameters.
 #include <zstd.h>
-#endif  // HAVE_ZSTD
+//#endif  // HAVE_ZSTD
 #include <zlib.h>
 
 #include <cassert>
@@ -136,7 +136,7 @@ inline bool Snappy_Uncompress(const char* input, size_t length, char* output) {
 
 inline bool Zstd_Compress(int level, const char* input, size_t length,
                           std::string* output) {
-#if HAVE_ZSTD
+//#if HAVE_ZSTD
   // Get the MaxCompressedLength.
   size_t outlen = ZSTD_compressBound(length);
   if (ZSTD_isError(outlen)) {
@@ -154,7 +154,7 @@ inline bool Zstd_Compress(int level, const char* input, size_t length,
   }
   output->resize(outlen);
   return true;
-#else
+/* #else
   // Silence compiler warnings about unused arguments.
   (void)level;
   (void)input;
@@ -162,6 +162,7 @@ inline bool Zstd_Compress(int level, const char* input, size_t length,
   (void)output;
   return false;
 #endif  // HAVE_ZSTD
+*/
 }
 
 inline bool ZlibRaw_Compress(int level, const char* input, size_t length,
@@ -218,22 +219,23 @@ inline bool ZlibRaw_Compress(int level, const char* input, size_t length,
 
 inline bool Zstd_GetUncompressedLength(const char* input, size_t length,
                                        size_t* result) {
-#if HAVE_ZSTD
+//#if HAVE_ZSTD
   size_t size = ZSTD_getFrameContentSize(input, length);
   if (size == 0) return false;
   *result = size;
   return true;
-#else
+/* #else
   // Silence compiler warnings about unused arguments.
   (void)input;
   (void)length;
   (void)result;
   return false;
 #endif  // HAVE_ZSTD
+*/
 }
 
 inline bool Zstd_Uncompress(const char* input, size_t length, char* output) {
-#if HAVE_ZSTD
+//#if HAVE_ZSTD
   size_t outlen;
   if (!Zstd_GetUncompressedLength(input, length, &outlen)) {
     return false;
@@ -245,13 +247,14 @@ inline bool Zstd_Uncompress(const char* input, size_t length, char* output) {
     return false;
   }
   return true;
-#else
+/*#else
   // Silence compiler warnings about unused arguments.
   (void)input;
   (void)length;
   (void)output;
   return false;
 #endif  // HAVE_ZSTD
+*/
 }
 
 inline bool ZLibRaw_Uncompress(const char* input, size_t length, ::std::string& output) {

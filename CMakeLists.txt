@@ -46,6 +46,7 @@ check_library_exists(tcmalloc malloc "" HAVE_TCMALLOC)
 
 #remove when check_library_exits starts working
 set(HAVE_SNAPPY ON)
+set(HAVE_ZSTD ON)
 
 include(CheckCXXSymbolExists)
 # Using check_cxx_symbol_exists() instead of check_c_symbol_exists() because
@@ -279,7 +280,7 @@ if(HAVE_SNAPPY)
   target_link_libraries(leveldb snappy)
 endif(HAVE_SNAPPY)
 if(HAVE_ZSTD)
-  target_link_libraries(leveldb zstd)
+  target_link_libraries(leveldb libzstd_static)
 endif(HAVE_ZSTD)
 if(HAVE_TCMALLOC)
   target_link_libraries(leveldb tcmalloc)
