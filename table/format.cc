@@ -155,7 +155,7 @@ Status ReadBlock(RandomAccessFile* file, const ReadOptions& options,
     }
     case kZLibRawCompression: {
       std::string buffer;
-      if (!port::ZLibRaw_Uncompress(data, n, buffer)) {
+      if (!port::ZlibRaw_Uncompress(data, n, buffer)) {
         delete[] buf;
         return Status::Corruption("corrupted zlib compressed block contents");
       }

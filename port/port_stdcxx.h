@@ -257,7 +257,7 @@ inline bool Zstd_Uncompress(const char* input, size_t length, char* output) {
 */
 }
 
-inline bool ZLibRaw_Uncompress(const char* input, size_t length, ::std::string& output) {
+inline bool ZlibRaw_Uncompress(const char* input, size_t length, ::std::string& output) {
   const int CHUNK = 64 * 1024;
 
   int ret;
