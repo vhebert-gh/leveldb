@@ -37,16 +37,17 @@ option(LEVELDB_INSTALL "Install LevelDB's header and library" ON)
 include(CheckIncludeFile)
 check_include_file("unistd.h" HAVE_UNISTD_H)
 
-add_subdirectory("third_party/zlib")
 include(CheckLibraryExists)
 check_library_exists(crc32c crc32c_value "" HAVE_CRC32C)
 check_library_exists(snappy snappy_compress "" HAVE_SNAPPY)
 check_library_exists(zstd zstd_compress "" HAVE_ZSTD)
+check_library_exists(zlibstatic deflate "" HAVE_ZSTD)
 check_library_exists(tcmalloc malloc "" HAVE_TCMALLOC)
 
 #remove when check_library_exits starts working
 set(HAVE_SNAPPY ON)
 set(HAVE_ZSTD ON)
+set(HAVE_ZLIB ON)
 
 include(CheckCXXSymbolExists)
 # Using check_cxx_symbol_exists() instead of check_c_symbol_exists() because
@@ -282,13 +283,16 @@ endif(HAVE_SNAPPY)
 if(HAVE_ZSTD)
   target_link_libraries(leveldb libzstd_static)
 endif(HAVE_ZSTD)
+if(HAVE_ZLIB)
+  target_link_libraries(leveldb zlibstatic)
+endif(HAVE_ZSTD)
 if(HAVE_TCMALLOC)
   target_link_libraries(leveldb tcmalloc)
 endif(HAVE_TCMALLOC)
 
 # Needed by port_stdcxx.h
 find_package(Threads REQUIRED)
-target_link_libraries(leveldb Threads::Threads zlibstaticleveldb)
+target_link_libraries(leveldb Threads::Threads)
 
 add_executable(leveldbutil
   "db/leveldbutil.cc"
