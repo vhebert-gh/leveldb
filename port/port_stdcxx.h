@@ -16,8 +16,8 @@
 
 #elif defined(__has_include)
 
-#if __has_include("port_2/port_config.h")
-#include "port_2/port_config.h"
+#if __has_include("port/port_config.h")
+#include "port/port_config.h"
 #endif  // __has_include("port/port_config.h")
 
 #endif  // defined(LEVELDB_HAS_PORT_CONFIG_H)
